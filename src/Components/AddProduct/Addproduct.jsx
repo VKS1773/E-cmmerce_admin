@@ -18,6 +18,39 @@ const Addproduct = () => {
     }
     const Add_Product=async()=>{
      console.log(productDetails);
+     let responseData;
+     let product=productDetails;
+     let formData=new FormData();
+     formData.append('product',image);
+     await fetch('http://localhost:4000/upload',{
+      method:'POST',
+      headers:{
+        Accept:'application/json',
+      },
+      body:formData,
+     }).then((resp)=>resp.json()).then((data)=>{responseData=data})
+     if(responseData.success)
+     {
+      product.image=responseData.image_url;
+      console.log(product)
+      await fetch('http://localhost:4000/addproduct',{
+        method:'POST',
+        headers:{
+          Accept:'application/json',
+          'Content-Type':'application/json',
+        },
+        body:JSON.stringify({
+          name:productDetails.name,
+          category:productDetails.category,
+          new_price:productDetails.new_price,
+          old_price:productDetails.old_price,
+          image:productDetails.image
+        }),
+      }).then((resp)=>resp.json()).then((data)=>{
+         data.success?alert('Product Added'):alert('Failed')
+      })
+     }
+
     }
   return (
     <div className="add-product">
@@ -47,9 +80,9 @@ const Addproduct = () => {
         <label htmlFor="file-input">
             <img src={image?URL.createObjectURL(image):upload_area} className="addproduct-thumnail-img" />
         </label>
-        <input onChange={imageHandler}type="file"  name="imgae" id='file-input' hidden/>
+        <input onChange={imageHandler} type="file"  name="im" id='file-input' hidden/>
       </div>
-      <button onClick={()=>{Add_Product()}}className="addproduct-btn">ADD</button>
+      <button onClick={()=>{Add_Product()}} className="addproduct-btn">ADD</button>
     </div>
   )
 }
